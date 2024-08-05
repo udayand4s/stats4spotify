@@ -1,17 +1,28 @@
-// pages/api/user/profile.ts
-import { NextApiRequest, NextApiResponse } from 'next';
+'use client'
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const accessToken = req.headers.authorization?.split(' ')[1];
+export default function HomePage() {
+  const { data: session } = useSession();
+  const [name, setName] = useState<string | null>(null);
 
-  if (!accessToken) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  useEffect(() => {
+    if (session?.accessToken) {
+      fetch('/api/user/profile', {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      })
+        .then(response => response.json())
+        .then(data => setName(data.display_name))
+        .catch(console.error);
+    }
+  }, [session]);
 
-  try {
-    const profile = await getUserProfile(accessToken);
-    res.status(200).json(profile);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch user profile' });
-  }
+  return (
+    <div>
+      <h1>Welcome to Spotify Stats</h1>
+      {name ? <p>Your name: {name}</p> : <p>Loading...</p>}
+    </div>
+  );
 }
