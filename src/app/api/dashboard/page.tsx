@@ -5,6 +5,7 @@ import axios from 'axios';
 const Page = () => {
   const [tokenResponse, setTokenResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [name, setName]= useState(null)
 
   useEffect(() => {
     let isMounted = true;
