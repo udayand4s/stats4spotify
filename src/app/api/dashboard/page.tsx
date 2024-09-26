@@ -8,53 +8,38 @@ const Page = () => {
   const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
-
     const fetchTokenAndProfile = async () => {
       try {
         // First, fetch the access token
         const tokenResponse = await axios.post('/api/getAccessToken');
 
         // Check if the token response is valid
-        if (tokenResponse.status === 200 && isMounted) {
+        if (tokenResponse.status === 200) {
           setTokenResponse(tokenResponse.data);
 
           // Now, fetch the user profile using the access token
-          try {
-            const profileResponse = await axios.get('/api/getUserProfile', {
-              headers: {
-                Authorization: `Bearer ${tokenResponse.data.access_token}`,
-              },
-            });
+          const profileResponse = await axios.get('/api/getUserProfile', {
+            headers: {
+              Authorization: `Bearer ${tokenResponse.data.access_token}`, // Pass the token in Authorization header
+            },
+          });
 
-            // Check if the profile response is valid
-            if (profileResponse.status === 200 && isMounted) {
-              setName(profileResponse.data.display_name);
-            } else if (isMounted) {
-              setError('Failed to fetch the user profile');
-            }
-          } catch (profileError) {
-            console.error('Error fetching user profile:', profileError);
-            if (isMounted) {
-              setError('Failed to fetch the user profile');
-            }
+          // Check if the profile response is valid
+          if (profileResponse.status === 200) {
+            setName(profileResponse.data.display_name);
+          } else {
+            setError('Failed to fetch the user profile');
           }
-        } else if (isMounted) {
+        } else {
           setError('Failed to fetch the access token');
         }
-      } catch (tokenError) {
-        console.error('Error fetching access token:', tokenError);
-        if (isMounted) {
-          setError('Failed to fetch the access token');
-        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('An error occurred while fetching data');
       }
     };
 
     fetchTokenAndProfile();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   return (

@@ -31,7 +31,6 @@ export async function GET(request: Request) {
     // Set up the headers with the access token
     const headers = {
       'Authorization': `Bearer ${access_token}`,
-      'Content-Type': 'application/json',
     };
 
     // Send a GET request to Spotify API to fetch the user's profile
