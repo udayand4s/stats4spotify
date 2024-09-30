@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export async function POST(request: Request) {
   try {
     const clientId = process.env.SPOTIFY_CLIENT_ID as string;
@@ -14,25 +16,12 @@ export async function POST(request: Request) {
       grant_type: 'client_credentials',
     }).toString();
 
-    const response = await fetch(tokenEndpointUri, {
-      method: 'POST',
+    const response = await axios.post(tokenEndpointUri, body, {
       headers,
-      body,
     });
-
-    if (!response.ok) {
-      // Handle non-2xx responses
-      console.error('Spotify API error:', response.statusText);
-      return new Response(JSON.stringify({ error: 'Failed to fetch token' }), {
-        status: response.status,
-      });
-    }
-
-    const tokenResponse = await response.json();
-    return new Response(JSON.stringify(tokenResponse), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    console.log(response)
+    return response;
+    
 
   } catch (error) {
     console.error('Error sending request:', error);
