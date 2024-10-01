@@ -1,25 +1,40 @@
 import axios from "axios";
+import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   try {
-    const tokenResponse = await axios.get('/api/getAccessToken'); 
-    const responseData = tokenResponse.data.access_token;
+    // First, request the access token from the `getAccessToken` endpoint
+    const tokenResponse = await axios.post('/api/getAccessToken');
+    const accessToken = tokenResponse.data.access_token;
+
+    if (!accessToken) {
+      console.error('Access token is missing');
+      return new Response(JSON.stringify({ error: 'Access token missing' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Access Token:', accessToken);
 
     const url = 'https://api.spotify.com/v1/me';
     const headers = {
-      'Authorization': `Bearer ${responseData}`,
-      'Content-Type': 'application/json'
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
     };
 
-    const response = await axios.get(url,
-      {headers
-      },
-    );
+    const profileResponse = await axios.get(url, { headers });
+    const userData = profileResponse.data;
 
-    const userData = await response;
-    return userData;
+    console.log('User Profile:', userData);
+
+    return NextResponse.json(userData);
 
   } catch (error) {
-    console.error('Error sending request:', error);
+    console.error('Error fetching user profile:', error);
+    return new Response(JSON.stringify({ error: 'Failed to fetch user profile' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

@@ -1,33 +1,38 @@
-'use client'
+'use client';
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-
 const Page = () => {
-  const [name, setName] = useState(null);
+  const [name, setName] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const tokenResponse = await axios.get('/api/getAccessToken');
-        const accessToken = tokenResponse.data.access_token;
-        console.log('Access Token:', accessToken);
-
+        // Request the user profile from your API endpoint
         const profileResponse = await axios.get('/api/getUserProfile');
-        console.log('Profile Response:', profileResponse);
+        const userProfile = profileResponse.data;
 
-        setName(profileResponse.data.display_name);
+        // Set the user's display name in the state
+        setName(userProfile.display_name);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching user profile:', error);
+      } finally {
+        setLoading(false); // Set loading to false once data is fetched or on error
       }
     };
 
     fetchUserProfile();
-  }, []); // Add an empty dependency array
+  }, []); // Runs once on component mount
 
   return (
     <div>
-      <p>{name}</p> // Display the name state
+      {loading ? (
+        <p>Loading...</p> // Show loading text while fetching data
+      ) : (
+        <p>{name ? name : 'Failed to load user data'}</p> // Display name or fallback message
+      )}
     </div>
   );
 };
