@@ -13,7 +13,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async redirect({ url, baseUrl }) {
       // Redirect to /api/dashboard after successful login
-      return `${baseUrl}/api/dashboard`;
+      return `${baseUrl}/dashboard`;
     },
     async jwt({ token, account }) {
       if (account) {

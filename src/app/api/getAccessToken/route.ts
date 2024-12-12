@@ -1,42 +1,36 @@
+import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
-import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const clientId = process.env.SPOTIFY_CLIENT_ID as string;
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET as string;
-
-    if (!clientId || !clientSecret) {
-      console.error('Spotify Client ID or Secret is missing');
-      return new Response(JSON.stringify({ error: 'Spotify credentials missing' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
     const tokenEndpointUri = 'https://accounts.spotify.com/api/token';
-    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
-    const headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${credentials}`,
-    };
-
-    const body = new URLSearchParams({
+    // Form the request payload
+    const data = new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
       grant_type: 'client_credentials',
-    }).toString();
-
-    const response = await axios.post(tokenEndpointUri, body, { headers });
-    const accessToken = response.data.access_token;
-
-    console.log('Access Token:', accessToken);
-    return NextResponse.json({ access_token: accessToken });
-
-  } catch (error) {
-    console.error('Error fetching access token:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch access token' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
     });
+
+    // Make the POST request using Axios
+    const response = await axios.post(tokenEndpointUri, data, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+      // Return the token response
+      return NextResponse.json(response.data, { status: 200 });
+
+  } catch (error: any) {
+    console.error('Error fetching token:', error.response?.data || error.message);
+
+    // Handle errors gracefully
+    return NextResponse.json(
+      { error: 'Failed to fetch token' },
+      { status: error.response?.status || 500 }
+    );
   }
 }
