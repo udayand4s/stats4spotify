@@ -1,12 +1,20 @@
 // pages/api/auth/[...nextauth].ts
-import type { NextAuthOptions } from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import SpotifyProvider from 'next-auth/providers/spotify';
+
+const scopes = [
+  'user-read-email',
+  'user-read-private',
+  'user-read-playback-state',
+  'user-modify-playback-state',
+].join(',');
 
 export const authOptions: NextAuthOptions = {
   providers: [
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID as string,
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET as string,
+      authorization: `https://accounts.spotify.com/authorize?scope=${scopes}`
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
@@ -25,7 +33,11 @@ export const authOptions: NextAuthOptions = {
       session.accessToken = token.accessToken as string;
       return session;
     },
-    }
+    },
+    session: {
+      strategy: 'jwt',},
     
 
   }
+
+  export default NextAuth(authOptions);

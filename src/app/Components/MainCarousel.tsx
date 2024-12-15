@@ -1,68 +1,55 @@
-"use client";
-import Image from "next/image";
-import React from "react";
-import { Carousel, Card } from "@/components/ui/apple-cards-carousel";
+'use client'
+import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 
-export function AppleCardsCarouselDemo() {
-  const cards = data.map((card, index) => (
-    <Card key={card.src} card={card} index={index} layout={true} />
-  ));
+const ClickableCard = () => {
+  const [loaded, setLoaded] = useState(false); // State to control the fade-in animation
+
+  const cards = [
+    {
+      title: 'Monthly Wrapped.',
+      imageUrl: '/1.jpg', // Replace with your first image URL
+      href: '/wrapped'
+    },
+    {
+      title: 'Your week in a glance.',
+      imageUrl: '/2.jpg', // Replace with your second image URL
+      href: '/wrapped'
+    },
+  ];
+
+  // Simulate loading with setTimeout to trigger fade-in
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoaded(true); // Set loaded to true after 500ms
+    }, 500); // 500ms delay before fading in
+
+    return () => clearTimeout(timer); // Cleanup the timer on unmount
+  }, []);
 
   return (
-    <div className="w-full h-full py-20">
-      <h2 className="max-w-7xl pl-4 mx-auto text-xl md:text-5xl font-bold text-neutral-600 dark:text-neutral-200 font-sans">
-        Good Evening, Anushka
-      </h2>
-      <Carousel items={cards} />
-    </div>
-  );
-}
-
-const DummyContent = () => {
-  return (
-    <>
-      {[...new Array(3).fill(1)].map((_, index) => {
-        return (
+    <div className="min-h-screen bg-black flex items-center justify-center space-x-10 p-4">
+      {cards.map((card, index) => (
+        <Link key={index} href={card.href}>
           <div
-            key={"dummy-content" + index}
-            className="bg-[#F5F5F7] p-8 md:p-14 rounded-3xl mb-4 border-2 border-white "
+            className={`relative w-[350px] h-[600px] rounded-[30px] overflow-hidden shadow-md flex items-end transition-all duration-500 ease-in-out transform ${
+              loaded ? 'opacity-100' : 'opacity-0'
+            } hover:scale-105 hover:opacity-90`} // Smooth scaling with opacity change on hover
+            style={{
+              backgroundImage: `url(${card.imageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
           >
-            <p className="text-neutral-600 text-4xl md:text-2xl font-sans max-w-3xl mx-auto">
-              <span className="font-bold text-neutral-700 text-4xl">
-                The first rule of Apple club is that you boast about Apple club.
-              </span>{" "}
-              Keep a journal, quickly jot down a grocery list, and take amazing
-              class notes. Want to convert those notes to text? No problem.
-              Langotiya jeetu ka mara hua yaar is ready to capture every
-              thought.
-            </p>
-            <Image
-              src="https://assets.aceternity.com/macbook.png"
-              alt="Macbook mockup from Aceternity UI"
-              height="500"
-              width="500"
-              className="md:w-1/2 md:h-1/2 h-full w-full mx-auto object-contain"
-            />
+            {/* Text Positioned at the Top */}
+            <div className="absolute top-0 left-0 p-5 bg-gradient-to-b from-black/70 via-black/40 to-transparent text-white w-full">
+              <h3 className="text-lg font-semibold px-1.5 py-1.5">{card.title}</h3>
+            </div>
           </div>
-        );
-      })}
-    </>
+        </Link>
+      ))}
+    </div>
   );
 };
 
-const data = [
-  {
-    category: "Monthly Wrapped.",
-    title: "",
-    src: "/1.jpg",
-    content: <DummyContent />,
-  },
-  {
-    category: "Your week in a glance.",
-    title: "",
-    src: "/2.jpg",
-    content: <DummyContent />,
-  },
- 
-  
-];
+export default ClickableCard;

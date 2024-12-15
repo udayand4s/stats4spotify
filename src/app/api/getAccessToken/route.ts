@@ -20,9 +20,10 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
-
+      
       // Return the token response
       return NextResponse.json(response.data, { status: 200 });
+      
 
   } catch (error: any) {
     console.error('Error fetching token:', error.response?.data || error.message);
