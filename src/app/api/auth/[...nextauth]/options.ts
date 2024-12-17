@@ -1,20 +1,14 @@
-// pages/api/auth/[...nextauth].ts
-import NextAuth, { NextAuthOptions } from 'next-auth';
+import NextAuth from 'next-auth';
 import SpotifyProvider from 'next-auth/providers/spotify';
-
-const scopes = [
-  'user-read-email',
-  'user-read-private',
-  'user-read-playback-state',
-  'user-modify-playback-state',
-].join(',');
+import { type NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     SpotifyProvider({
-      clientId: process.env.SPOTIFY_CLIENT_ID as string,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET as string,
-      authorization: `https://accounts.spotify.com/authorize?scope=${scopes}`
+      authorization:
+        'https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private',
+      clientId: process.env.SPOTIFY_CLIENT_ID ?? '',
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? '',
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
@@ -22,22 +16,18 @@ export const authOptions: NextAuthOptions = {
     async redirect({ url, baseUrl }) {
       // Redirect to /api/dashboard after successful login
       return `${baseUrl}/dashboard`;
-    },
-    async jwt({ token, account }) {
+    }, 
+    async jwt({token, account}) {
       if (account) {
-        token.accessToken = account.access_token as string;
+        token.accessToken = account.refresh_token;
       }
       return token;
     },
-    async session({ session, token }) {
-      session.accessToken = token.accessToken as string;
+    async session({session, user}) {
+      session.user = user ;
       return session;
     },
-    },
-    session: {
-      strategy: 'jwt',},
-    
+  },
+  
+};
 
-  }
-
-  export default NextAuth(authOptions);

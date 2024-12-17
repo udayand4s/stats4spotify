@@ -2,12 +2,15 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ClickableCard from '../Components/MainCarousel';
+import { useSession } from 'next-auth/react';
 
 const Page = () => {
   const [name, setName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [time, setTime] = useState<string>('');
   const [loaded, setLoaded] = useState(false); // State to control fade-in of the "Good Evening" text
+  const { data: session } = useSession();
+  console.log(session)
 
   const fetchTokenAndProfile = async () => {
     try {
@@ -18,16 +21,16 @@ const Page = () => {
         throw new Error('Access token not found');
       }
 
-      const accessCode = tokenResponse.data.access_token;
-      console.log(accessCode);
+      const {access_token} = await tokenResponse.data;
+      console.log(access_token);
 
       // Fetch user profile
       const profileEndpointUri = 'https://api.spotify.com/v1/me/';
       const headers = {
-        Authorization: `Bearer ${accessCode}`,
+        Authorization: `Bearer ${access_token}`,
       };
 
-      if (accessCode) {
+      if (access_token) {
         const profileResponse = await axios.get('https://api.spotify.com/v1/me', { headers });
         
         console.log(profileResponse.data);
