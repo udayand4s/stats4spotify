@@ -10,18 +10,12 @@ interface SpotifyUser {
   followers: { total: number };
 }
 
-interface Playlist {
-  id: string;
-  name: string;
-  description: string;
-  images: { url: string }[];
-  tracks: { total: number };
-}
+
+
 
 export default function HomePage() {
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<SpotifyUser | null>(null);
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [time, setTime] = useState<string>('');
@@ -46,7 +40,6 @@ export default function HomePage() {
   useEffect(() => {
     if (session?.accessToken) {
       fetchUserProfile();
-      fetchUserPlaylists();
     } else {
       setLoading(false);
     }
@@ -78,19 +71,7 @@ export default function HomePage() {
     }
   };
 
-  const fetchUserPlaylists = async () => {
-    try {
-      const response = await axios.get("https://api.spotify.com/v1/me/playlists", {
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-      });
-      
-      setPlaylists(response.data.items);
-    } catch (err: any) {
-      console.error("Error fetching playlists:", err);
-    }
-  };
+  
 
   return (
     <div className="w-screen min-h-screen bg-black text-white flex flex-col">
