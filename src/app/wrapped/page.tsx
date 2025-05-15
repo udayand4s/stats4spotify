@@ -12,10 +12,9 @@ interface Artist {
 }
 
 const TopArtistsPage = () => {
-  const { data: session, status } = useSession();
+  const {data: session} = useSession();
   const [topArtists, setTopArtists] = useState<Artist[]>([]);
   const [loading, setLoading] = useState(true);
-  const [time, setTime] = useState<string>('');
 
   // Fetch top artists when session is available
   useEffect(() => {
@@ -37,9 +36,9 @@ const TopArtistsPage = () => {
         );
         setTopArtists(response.data.items);
       } catch (error) {
-        console.error("Error fetching top artists:", error);
+          console.error("Error fetching top artists:", error);
       } finally {
-        setLoading(false);
+          setLoading(false);
       }
     }
   };
